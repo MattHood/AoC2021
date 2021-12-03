@@ -1,22 +1,18 @@
 // TODO, fix Deno linting bug. It seems to include declarations from other files in this file's scope.
-
-type Direction = 'forward' | 'up' | 'down';
+const Directions = ['forward', 'up', 'down'] as const;
+type Direction = typeof Directions[number];
+const isDirection = (input: string): input is Direction => Directions.includes(input as Direction);
 type PositionA = { horizontal: number, depth: number }
 type PositionB = PositionA & { aim: number };
 type Velocity = { direction: Direction, magnitude: number };
 
-function isDirection(input: string): input is Direction {
-    return ['forward', 'up', 'down'].includes(input);
-}
 
 function parse(input: string): Velocity {
     const [direction, magnitude ] = input.split(" ");
     if( isDirection(direction) && !isNaN(Number(magnitude))) {
         return { direction: direction, magnitude: Number(magnitude) }
     }
-    else {
-        throw new Error(`unknown direction and magnitude for ${input}: [${direction}, ${magnitude}]`);
-    }
+    else throw new Error(`unknown direction and magnitude for ${input}: [${direction}, ${magnitude}]`);
 }
 
 function updateA(pos: PositionA, vel: Velocity): PositionA {
@@ -37,9 +33,7 @@ function updateB(pos: PositionB, vel: Velocity): PositionB {
     }
 }
 
-function multiply(pos: PositionA | PositionB): number {
-    return pos.horizontal * pos.depth;
-}
+const multiply = (pos: PositionA | PositionB): number => pos.horizontal * pos.depth;
 
 function part2A(data: string[]): number {
     const init = { horizontal: 0, depth: 0 };
@@ -67,8 +61,7 @@ const testData2 =
     'down 8',
     'forward 2'];
 const puzzleData2 = await Deno.readTextFile('./Matt/day2.csv');
-const velocities: string[] = puzzleData2
-    .split(/\r?\n/);
+const velocities: string[] = puzzleData2.split(/\r?\n/);
 console.log(`Part A, Test, want 150: ${part2A(testData2)}`);
 console.log(`Part A, : ${part2A(velocities)}`);
 console.log(`Part B, Test, want 900: ${part2B(testData2)}`);
